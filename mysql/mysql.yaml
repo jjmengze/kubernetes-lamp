@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mysql-server
+  labels:
+    app: mysql-server
+spec:
+  template:
+    metadata:
+      labels:
+        app: mysql-server
+    spec:
+      containers:
+      - name: mysql-server
+        image: mysql:5.6
+        env:
+        - name: MYSQL_DATABASE
+          value: demo
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password.txt
+        ports:
+        - containerPort: 3306
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mysql-service
+spec:
+  selector:
+  app: mysql-server
+  ports:
+    - name: mysql
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
