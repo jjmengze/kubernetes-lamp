@@ -1,0 +1,42 @@
+Version: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: my-php7-server
+  labels:
+    app: my-php7-server
+spec:
+  template:
+    metadata:
+      labels:
+        app: my-php7-server
+    spec:
+      containers:
+      - name: my-php7-server
+        image: docker.io/ameng/php7-apache2
+        env:
+        - name: DB_HOST
+          value: mysql-service.default.svc.cluster.local
+        - name: DB_NAME
+          value: demo
+        - name: DB_USER
+          value: root
+        - name: DB_PWD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password.txt
+        ports:
+        - containerPort: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-php7-server
+spec:
+  selector:
+    app: my-php7-server
+  ports:
+    - name: php
+      protocol: TCP
+      port: 80
+      targetPort: 80targetPort: 80
